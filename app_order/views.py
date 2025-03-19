@@ -135,22 +135,22 @@ def order_company_status(request, pk):
 
 class OrderCustomerListAPIView(ListAPIView):
     serializer_class = OrderListSerializer
-    queryset =  Order.objects.all()
+    queryset = Order.objects.all()
+
     def get_queryset(self):
-        token = self.request.META['HTTP_TOKEN']
+        token = self.request.META.get('HTTP_TOKEN')  # get() ishlatish yaxshiroq
 
         if not token:
             raise AuthenticationFailed('Invalid token, login again, please')
 
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-            pin = payload['id']
+            customer_id = payload['id']  # 'id' ni olamiz
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Token expired, login again, please')
 
-        queryset = Order.objects.filter(customer_id=id).order_by("-create_at")
-        return queryset    
-
+        queryset = Order.objects.filter(customer_id=customer_id).order_by("-create_at")
+        return queryset
 
 
 
