@@ -1,0 +1,6 @@
+--2023-10-10 15:40:15--  https://mspd-api.soliq.uz/minstroy/construction/get-factura-list-by-catalog-code?catalogCode=03824001020000000
+Resolving mspd-api.soliq.uz (mspd-api.soliq.uz)... 10.190.25.113, 10.190.25.113
+Connecting to mspd-api.soliq.uz (mspd-api.soliq.uz)|10.190.25.113|:443... connected.
+ERROR: no certificate subject alternative name matches
+	requested host name ‘mspd-api.soliq.uz’.
+To connect to mspd-api.soliq.uz insecurely, use `--no-check-certificate'.
