@@ -144,11 +144,11 @@ class OrderCustomerListAPIView(ListAPIView):
 
         try:
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-            pin = payload['pin']
+            pin = payload['id']
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Token expired, login again, please')
 
-        queryset = Order.objects.filter(customer_pin=pin).order_by("-create_at")
+        queryset = Order.objects.filter(customer_id=id).order_by("-create_at")
         return queryset    
 
 
