@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from app_company.models import Companies
 
-from users.models import ONEID
+from users.models import ONEID, CatalogUsers
 
 
 ORDER_STATUS = (
@@ -26,7 +26,7 @@ PRODUCT_FILTER=  (
 )
 
 class Order(models.Model):
-    customer =  models.ForeignKey(ONEID, on_delete=models.CASCADE)
+    customer =  models.ForeignKey(CatalogUsers, on_delete=models.CASCADE)
     company =  models.CharField(max_length=9)
     company_name  =  models.CharField(max_length=300, null=True, blank=True)
     product_code =  models.CharField(max_length=200)
