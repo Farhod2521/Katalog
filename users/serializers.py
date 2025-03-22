@@ -31,7 +31,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 
-class UserSerializer(ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['id', 'email', 'first_name', 'last_name', 'phone', 'password', 'company']
@@ -39,27 +39,24 @@ class UserSerializer(ModelSerializer):
             'password': {'write_only': True}
         }
 
+    def validate_phone(self, value):
+        """Telefon raqam unikal ekanligini tekshiradi"""
+        if CatalogUsers.objects.filter(phone=value).exists():
+            raise serializers.ValidationError("Bu telefon raqami allaqachon mavjud.")
+        return value
 
-    def validate(self, data):
-        errors = {}
+    def validate_email(self, value):
+        """Email unikal ekanligini tekshiradi"""
+        if CatalogUsers.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Bu email allaqachon mavjud.")
+        return value
 
-      
-        if CatalogUsers.objects.filter(phone=data.get('phone')).exists():
-            errors['phone'] = "Bu telefon raqami allaqachon mavjud."
+    def validate_company(self, value):
+        """Company (inn yoki pnfl) unikal ekanligini tekshiradi"""
+        if CatalogUsers.objects.filter(inn=value).exists():
+            raise serializers.ValidationError("Bu pnfl allaqachon mavjud.")
+        return value
 
-        # Email tekshirish
-        if CatalogUsers.objects.filter(email=data.get('email')).exists():
-            errors['email'] = "Bu email allaqachon mavjud."
-
-        # company tekshirish (agar modelda bo‘lsa)
-        if 'company' in data and CatalogUsers.objects.filter(inn=data.get('company')).exists():
-            errors['company'] = "Bu pnfl allaqachon mavjud."
-
-        if errors:
-            raise serializers.ValidationError(errors)
-
-        return data
-    
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
@@ -68,7 +65,6 @@ class UserSerializer(ModelSerializer):
         instance.is_active = False
         instance.save()
         return instance
-    
    
 
     
