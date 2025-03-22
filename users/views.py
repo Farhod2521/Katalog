@@ -351,7 +351,22 @@ class CatalogUsersUpdateView(UpdateAPIView):
 
 
 
+# class Company_Profile_View(APIView):
+#     permission_classes = [IsAuthenticated]  # Faqat autentifikatsiyalangan foydalanuvchilar kirishi mumkin
 
+#     def get(self, request, *args, **kwargs):
+#         company_stir = request.query_params.get('company_stir')
+
+#         if not company_stir:
+#             return Response({'error': 'company_stir ni kiriting!'}, status=400)
+
+#         company = Companies.objects.filter(company_stir=company_stir).first()
+
+#         if not company:
+#             return Response({'error': 'Bunday kompaniya topilmadi!'}, status=404)
+
+#         serializer = CompaniesSerializer(company)
+#         return Response(serializer.data, status=200)
 
 
 

@@ -49,7 +49,7 @@ class Order(models.Model):
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 class RatingCommentCustomer(models.Model):
-    customer =  models.ForeignKey(ONEID, on_delete=models.CASCADE)
+    customer =  models.ForeignKey(CatalogUsers, on_delete=models.CASCADE)
     company_stir =  models.CharField(max_length=9)
     product_category = models.CharField(choices=PRODUCT_FILTER, max_length=20)
     ad_id =  models.IntegerField()
