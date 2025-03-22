@@ -43,17 +43,16 @@ class UserSerializer(ModelSerializer):
     def validate(self, data):
         errors = {}
 
-        # Telefon raqam tekshirish
-        User = get_user_model()
-        if User.objects.filter(phone=data.get('phone')).exists():
+      
+        if CatalogUsers.objects.filter(phone=data.get('phone')).exists():
             errors['phone'] = "Bu telefon raqami allaqachon mavjud."
 
         # Email tekshirish
-        if User.objects.filter(email=data.get('email')).exists():
+        if CatalogUsers.objects.filter(email=data.get('email')).exists():
             errors['email'] = "Bu email allaqachon mavjud."
 
         # company tekshirish (agar modelda bo‘lsa)
-        if 'company' in data and User.objects.filter(inn=data.get('company')).exists():
+        if 'company' in data and CatalogUsers.objects.filter(inn=data.get('company')).exists():
             errors['company'] = "Bu pnfl allaqachon mavjud."
 
         if errors:
