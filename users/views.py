@@ -323,7 +323,8 @@ class CatalogUsersListView(ListAPIView):
         email = self.request.query_params.get('email')
         if email:
             return CatalogUsers.objects.filter(email=email)
-        return CatalogUsers.objects.all()
+        return Response({'error': 'Emailni  kiriting !!!'}, status=404)
+ 
 
 class CatalogUsersUpdateView(UpdateAPIView):
     serializer_class = CatalogUsersSerializer
