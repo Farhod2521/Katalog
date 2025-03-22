@@ -527,28 +527,30 @@ from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponseBadRequest
 import random
 from django.shortcuts import get_object_or_404
-class RegisterAPIView(CreateAPIView):
-    serializer_class = UserSerializer
+class RegisterAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            verification_code = random.randint(1000, 9999)
+            user = serializer.save()
+            user.profile.verification_code = verification_code
+            user.profile.save()
 
-    def perform_create(self, serializer):
-        verification_code = random.randint(1000, 9999)
-        user = serializer.save()
-        user.profile.verification_code = verification_code
-        user.profile.save()
+            try:
+                send_mail(
+                    subject="ELEKTRON KLASSIFIKATOR",
+                    message=f"Sizning tasdiqlash kodingiz: {verification_code}",
+                    from_email="abdikarimovfarhod2109@gmail.com",
+                    recipient_list=[user.email],
+                )
+            except BadHeaderError:
+                return Response({"error": "Invalid header found."}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({"error": f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        try:
-            send_mail(
-                subject="ELEKTRON KLASSIFIKATOR",
-                message=f"Sizning tasdiqlash kodingiz: {verification_code}",
-                from_email="abdikarimovfarhod2109@gmail.com", 
-                recipient_list=[user.email],
-            )
-        except BadHeaderError:
-            return HttpResponseBadRequest("Invalid header found.")
-        except Exception as e:
-            return HttpResponse(f"An error occurred: {e}")
+            return Response({"detail": "Registration successful. Please check your email for the verification code."}, status=status.HTTP_201_CREATED)
         
-        return Response({"detail": "Registration successful. Please check your email for the verification code."})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyEmailAPIView(APIView):
 

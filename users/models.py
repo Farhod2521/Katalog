@@ -30,7 +30,7 @@ class ONEID(models.Model):
 class CatalogUsers(AbstractUser):
     email = models.EmailField(verbose_name='Elektron pochta', unique=True)
     password = models.CharField(max_length=255)
-    company = models.CharField(verbose_name='Kompaniya ID', unique=True, max_length=9)
+    company = models.CharField(verbose_name='pnfl', unique=True, max_length=14)
     role =  models.CharField(max_length=10, choices=USER_ROLE, default="customer")
     phone = models.CharField(verbose_name='Asosiy telefon raqami', max_length=15, help_text='Iltimos, +99871-1234567 yoki +99890-1234567 shaklida to‘ldiring', null=True, blank=True)
     username = None
