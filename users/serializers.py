@@ -53,7 +53,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_company(self, value):
         """Company (inn yoki pnfl) unikal ekanligini tekshiradi"""
-        if CatalogUsers.objects.filter(inn=value).exists():
+        if CatalogUsers.objects.filter(company=value).exists():
             raise serializers.ValidationError("Bu pnfl allaqachon mavjud.")
         return value
 
