@@ -8,7 +8,9 @@ import jwt, datetime
 from .models import CatalogUsers, PasswordResets, ONEID
 from .serializers import (
 LoginSerializer, UserSerializer, UserTopAdsSerializer, 
-PasswordResetRequestSerializer, PasswordResetConfirmSerializer,PasswordResetCodeSerializer, ONEIDSerializer)
+PasswordResetRequestSerializer, PasswordResetConfirmSerializer,PasswordResetCodeSerializer, ONEIDSerializer, CatalogUsersSerializer
+
+)
 from django.utils.crypto import get_random_string
 
 from app_company.models import Companies, AllAds
@@ -311,9 +313,25 @@ class LoginView(APIView):
 
 
 
+from rest_framework.permissions import IsAuthenticated
 
+class CatalogUsersListView(ListAPIView):
+    serializer_class = CatalogUsersSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        email = self.request.query_params.get('email')
+        if email:
+            return CatalogUsers.objects.filter(email=email)
+        return CatalogUsers.objects.all()
 
+class CatalogUsersUpdateView(UpdateAPIView):
+    serializer_class = CatalogUsersSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        email = self.request.data.get('email')
+        return get_object_or_404(CatalogUsers, email=email)
 
 
 

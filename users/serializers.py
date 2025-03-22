@@ -75,6 +75,19 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class CatalogUsersSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CatalogUsers
+        fields = [
+            'id', 'email', 'first_name', 'last_name', 'full_name', 
+            'company', 'role', 'phone', 'date_joined', 'last_login'
+        ]
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
+    
 
 
 

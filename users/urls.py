@@ -18,7 +18,7 @@ from .views import (
     PasswordResetRequestAPIView,
     PasswordResetConfirmAPIView,
     PasswordResetCodeAPIView, 
-    OneIDLoginView
+    OneIDLoginView, CatalogUsersListView, CatalogUsersUpdateView
     
     )
 
@@ -36,6 +36,8 @@ urlpatterns = [
     path('imzo', LoginByDigitalSignatureView.as_view()),
 
     path('cutomer/register/', RegisterAPIView.as_view()),
+    path('customer/profile', CatalogUsersListView.as_view(), name='users-list'),
+    path('customer/profile_update/', CatalogUsersUpdateView.as_view(), name='users-update'),
     path('passowrd/change/', password_change_view, name="password-change"),
     path('verify-email/', VerifyEmailAPIView.as_view(), name='verify-email'),
     path('resend-verification-code/', ResendVerificationCodeAPIView.as_view(), name='resend-verification-code'),
