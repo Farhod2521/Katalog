@@ -323,11 +323,23 @@ class CatalogUsersListView(ListAPIView):
         email = self.request.query_params.get('email')
         if email:
             return CatalogUsers.objects.filter(email=email)
-        return Response({'error': 'Emailni  kiriting !!!'}, status=404)
+        return CatalogUsers.objects.none()  # Bo‘sh queryset qaytarish kerak
+
+    def list(self, request, *args, **kwargs):
+        email = request.query_params.get('email')
+        if not email:
+            return Response({'error': 'Emailni kiriting !!!'}, status=400)
+
+        queryset = self.get_queryset()
+        if not queryset.exists():
+            return Response({'error': 'Bunday foydalanuvchi topilmadi!'}, status=404)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
  
 
 class CatalogUsersUpdateView(UpdateAPIView):
-    serializer_class = CatalogUsersSerializer
+    serializer_class = CatalogUsersSerializer     
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
