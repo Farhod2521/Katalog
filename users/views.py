@@ -362,7 +362,7 @@ class CatalogUsersUpdateView(UpdateAPIView):
 
 #         company = Companies.objects.filter(company_stir=company_stir).first()
 
-#         if not company:
+#         if not company:F
 #             return Response({'error': 'Bunday kompaniya topilmadi!'}, status=404)
 
 #         serializer = CompaniesSerializer(company)
@@ -569,35 +569,60 @@ class UserTopAdsView(ListAPIView):
 from rest_framework.decorators import api_view
 from rest_framework import status
 from django.http import HttpResponse
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import send_mail, BadHeaderError, EmailMessage
 from django.http import HttpResponseBadRequest
 import random
 from django.shortcuts import get_object_or_404
-class RegisterAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            verification_code = random.randint(1000, 9999)
-            user = serializer.save()
-            user.profile.verification_code = verification_code
-            user.profile.save()
+import threading
 
+class RegisterAPIView(CreateAPIView):
+    serializer_class = UserSerializer
+
+    def perform_create(self, serializer):
+        verification_code = random.randint(1000, 9999)
+        user = serializer.save()
+        user.profile.verification_code = verification_code
+        user.profile.save()
+
+        # HTML dizaynli xabar
+        email_subject = "ELEKTRON KLASSIFIKATOR - Tasdiqlash Kodingiz"
+        email_body = f"""
+        <div style="font-family: Arial, sans-serif; padding: 20px; text-align: center;">
+            <h2 style="color: #333;">Tasdiqlash Kodingiz</h2>
+            <p style="font-size: 18px; color: #555;">
+                Hurmatli <strong>{user.first_name}</strong>, ro‘yxatdan o‘tganingiz uchun rahmat!<br>
+                Sizning tasdiqlash kodingiz:
+            </p>
+            <div style="background-color: #f4f4f4; padding: 15px; display: inline-block; font-size: 22px; font-weight: bold; border-radius: 5px;">
+                {verification_code}
+            </div>
+            <p style="color: #777; margin-top: 20px;">
+                Agar bu xabar sizga noto‘g‘ri kelgan bo‘lsa, iltimos, uni e’tiborsiz qoldiring.
+            </p>
+        </div>
+        """
+
+        # Email jo‘natish funksiyasi
+        def send_email():
             try:
-                send_mail(
-                    subject="ELEKTRON KLASSIFIKATOR",
-                    message=f"Sizning tasdiqlash kodingiz: {verification_code}",
-                    from_email="abdikarimovfarhod2109@gmail.com",
-                    recipient_list=[user.email],
+                email = EmailMessage(
+                    subject=email_subject,
+                    body=email_body,
+                    from_email="tmsiti.work@gmail.com",
+                    to=[user.email],
                 )
+                email.content_subtype = "html"  # HTML formatda jo‘natish
+                email.send()
             except BadHeaderError:
-                return Response({"error": "Invalid header found."}, status=status.HTTP_400_BAD_REQUEST)
+                return HttpResponseBadRequest("Invalid header found.")
             except Exception as e:
-                return Response({"error": f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return HttpResponse(f"Xatolik yuz berdi: {e}")
 
-            return Response({"detail": "Registration successful. Please check your email for the verification code."}, status=status.HTTP_201_CREATED)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # E-mailni alohida threadda jo‘natish (tezroq bajariladi)
+        email_thread = threading.Thread(target=send_email)
+        email_thread.start()
 
+        return Response({"detail": "Ro‘yxatdan o‘tish muvaffaqiyatli. Tasdiqlash kodi emailingizga yuborildi!"})
 class VerifyEmailAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
