@@ -618,7 +618,7 @@ class RegisterAPIView(CreateAPIView):
             except Exception as e:
                 return HttpResponse(f"Xatolik yuz berdi: {e}")
 
-        # E-mailni alohida threadda jo‘natish (tezroq bajariladi)
+
         email_thread = threading.Thread(target=send_email)
         email_thread.start()
 
