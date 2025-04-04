@@ -17,9 +17,9 @@ class CompanyFilter(admin.SimpleListFilter):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("customer", "company", "product_name", "price", "quantity", "order_status", "create_at")
+    list_display = ("customer", "company","company_name","product_name", "price", "quantity", "order_status", "create_at")
     list_filter = (CompanyFilter, "order_status")
 
-    
+
 admin.site.register(RatingCommentCustomer)
 # Register your models here.
